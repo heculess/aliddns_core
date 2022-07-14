@@ -181,7 +181,7 @@ class AliddnsCore:
             return True
         return False
 
-    def update_dns_record(self, rc_value, rc_record_id, api_type, record_ip_v6):
+    def update_dns_record(self, rc_value, rc_record_id, api_type, record_ip_v6=False):
         if rc_record_id < 0:
             self.add_dns(rc_value, api_type)
         else:         
@@ -199,17 +199,30 @@ class AliddnsCore:
             self._record = rc_value
 
         self._update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        return False
 
-    def update_ddns(self, ddns_record, ddns_record_v6):
+    def update_ddns(self, ddns_record, ddns_record_v6=None):
 
         if self.need_check_record_id(ddns_record_v6):
             if self.check_record_id(self._sub_domain, self._domain) < 0:
                 self._state = "network error"
                 return False
 
-        self.update_dns_record(ddns_record, self._rc_record_id, self._Aliyun_API_Type, False)
+        self.update_dns_record(ddns_record, self._rc_record_id, self._Aliyun_API_Type)
         if ddns_record_v6:
-            self.update_dns_record(ddns_record_v6, self._rc_record_v6_id, self._Aliyun_API_V6_Type, True)
+            self.update_dns_record(ddns_record_v6, self._rc_record_v6_id, 
+                self._Aliyun_API_V6_Type, True)
 
         return True
+
+    def init_ddns_info(self):
+
+        if self.need_check_record_id(True):
+            if self.check_record_id(self._sub_domain, self._domain) < 0:
+                self._state = "network error"
+                return False
+
+        if self._rc_record_id >= 0 :
+            self._record = self.old_ip(self._rc_record_id)
+
+        if self._rc_record_v6_id >= 0 :
+            self._record_v6 = self.old_ip(self._rc_record_v6_id)
