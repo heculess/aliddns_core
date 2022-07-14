@@ -1,0 +1,4 @@
+build/
+dist/
+aliddns_core.egg-info/
+aliddns_core/__pycache__/
